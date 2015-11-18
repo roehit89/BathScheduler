@@ -11,9 +11,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,9 +46,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // to fix orientation.
+       //    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // to fix orientation.
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Log.i("on create called","on create called");
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setBackgroundColor(getResources().getColor(android.R.color.background_dark));
         setSupportActionBar(toolbar);
         getWindow().getDecorView().setBackgroundColor(Color.DKGRAY);
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.textView);
         textView.setVisibility(View.INVISIBLE);
         button = (Button) findViewById(R.id.button);
+        button.setText("Start Bath");
         final Button cancelButton = (Button) findViewById(R.id.cancelButton);
         final TextView phase1text = (TextView)findViewById(R.id.phase1Text);
         final TextView phase2text = (TextView)findViewById(R.id.phase2Text);
@@ -71,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                button.setText("Cancel Bath");
               //  seconds = Integer.parseInt((String) secondsText.getText());
                 phase1Minutes = Integer.parseInt((phase1text.getText()).toString());
                 phase2Minutes = Integer.parseInt((phase2text.getText()).toString());
@@ -106,14 +112,18 @@ public class MainActivity extends AppCompatActivity {
                             textView.setText("Start shower in.. " + String.valueOf(millisUntilFinished / 1000));
                             Log.i("timer", String.valueOf(millisUntilFinished / 1000));
 
-                            cancelButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    timer1.cancel();
-                                    textView.setText("Bath cancelled.. !!");
-                                }
-                            });
-
+                            //String buttonText = button
+                            if(button.getText().toString().equals("Cancel Bath")) {
+                                Log.i("hello", (String) cancelButton.getText());
+                                button.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        timer1.cancel();
+                                        textView.setText("Bath cancelled.. !!");
+                                        button.setText("Start Bath");
+                                    }
+                                });
+                            }
                         }
                     }
 
@@ -152,5 +162,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        Long lastTime = System.currentTimeMillis();
+
+        if(keyCode == event.KEYCODE_VOLUME_DOWN)
+        {
+        //    if(System.currentTimeMillis() + 1 <= 250)
+            Log.i(TAG+ "down key pressed : systemTime", String.valueOf(System.currentTimeMillis()));
+            Log.i(TAG+ "down key pressed : last value", String.valueOf(lastTime ));
+
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
